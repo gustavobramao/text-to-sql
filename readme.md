@@ -1,51 +1,42 @@
-AI-Powered SQL Query Generator with Flask
+# AI-Powered SQL Query Generator with Flask
+
 This is a Python Flask web application that leverages OpenAI's text generation capabilities to automatically generate SQL queries based on user prompts. The application takes a user input as a prompt, converts it into a SQL query, executes the query on a SQLite database, and returns the query results in JSON format.
 
-Getting Started
-Follow these instructions to set up and run the application on your local machine.
+## Getting Started
 
-Prerequisites
-Python 3.6 or higher
-virtualenv (recommended)
-Installation
-Clone the repository and navigate to the project directory:
+### Prerequisites
 
-bash
-Copy code
-git clone <repository_url>
-cd <project_directory>
-Create a virtual environment (optional but recommended):
+- Python 3.6 or higher
+- `virtualenv` (recommended)
 
-bash
-Copy code
+### Installation
+
+1. Clone the repository and navigate to the project directory:
+
+   ```bash
+   git clone <repository_url>
+   cd <project_directory>
+
+
 # Create a virtual environment
 python -m venv venv
 
 # Activate the virtual environment
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-Install the required packages:
 
-bash
-Copy code
-pip install -r requirements.txt
-Configuration
-Create a config.py file in the project directory with your OpenAI API key:
 
-python
-Copy code
 # config.py
 open_ai_api_key = "your_openai_api_key_here"
-Replace "your_openai_api_key_here" with your actual OpenAI API key.
+
 
 Running the Application
 Make sure you are in the project directory and your virtual environment is activated.
 
 Run the Flask application:
 
-bash
-Copy code
-python app.py
-The application will start locally and can be accessed at http://127.0.0.1:5000.
+python main.py
+
+The application will start locally and can be accessed at http://127.0.0.1:5000
 
 How the Application Works
 The user provides a prompt through the /query endpoint either via a GET request with the user_input parameter or a POST request with a JSON payload containing the user_input key.
