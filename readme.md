@@ -56,7 +56,6 @@ The generated SQL query undergoes refinement to meet specific criteria and avoid
 Database connectivity is achieved through SQLAlchemy.
 OpenAI's API is employed for text generation.
 
-Contributors
 Contributor: Gustavo Bramao.
 
 
