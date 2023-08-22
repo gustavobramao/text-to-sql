@@ -9,21 +9,9 @@ This is a Python Flask web application that leverages OpenAI's text generation c
 - Python 3.6 or higher
 - `virtualenv` (recommended)
 
-### Installation
 
-1. Clone the repository and navigate to the project directory:
-
-   ```bash
-   git clone <repository_url>
-   cd <project_directory>
-
-
-# Create a virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
+Configuration
+Create a config.py file in the project directory with your OpenAI API key:
 
 # config.py
 open_ai_api_key = "your_openai_api_key_here"
@@ -38,32 +26,40 @@ python main.py
 
 The application will start locally and can be accessed at http://127.0.0.1:5000
 
-How the Application Works
-The user provides a prompt through the /query endpoint either via a GET request with the user_input parameter or a POST request with a JSON payload containing the user_input key.
+How the Application Operates
+The user supplies a prompt through the /query endpoint. This can be achieved either by submitting a GET request along with the user_input parameter or by employing a POST request which encompasses a JSON payload containing the user_input key.
 
-The provided prompt is used to generate an SQL query using OpenAI's text generation API.
+The provided prompt serves as the basis for generating an SQL query via OpenAI's text generation API.
 
-The generated SQL query is refined to ensure it meets specific criteria and does not contain undesired elements.
+The produced SQL query undergoes refinement to ensure alignment with specific criteria and to exclude undesirable components.
 
-The application connects to a SQLite database named mydatabase.db.
+The application establishes a connection with a SQLite database named mydatabase.db.
 
-The generated SQL query is executed on the database, and the query results are obtained.
+Execution of the generated SQL query occurs within the database, leading to the retrieval of query results.
 
-The application processes the query results, converting the 'date' column to datetime and extracting the date component.
+The application processes the query results, converting the 'date' column into a datetime format and extracting the date component.
 
-The processed results are converted to JSON format and returned to the user.
+Processed outcomes are then transformed into JSON format prior to being delivered back to the user.
 
 API Endpoint
 Endpoint: /query
 Methods: GET, POST
 Parameters:
-user_input: The user-provided prompt for generating the SQL query.
-Note: If using the POST method, provide the user_input in the JSON payload.
-Notes
-The application uses the Flask framework for creating the API and handling requests.
-Cross-Origin Resource Sharing (CORS) is enabled using the flask_cors extension.
-The generated SQL query is refined to meet specific criteria and avoid certain patterns.
-The database connection is established using SQLAlchemy.
-OpenAI's API is used for text generation.
+
+user_input: The prompt supplied by the user to generate the SQL query.
+Note: When using the POST method, ensure that the user_input is included within the JSON payload.
+
+Additional Notes
+The Flask framework is utilized to craft the API and manage incoming requests.
+Cross-Origin Resource Sharing (CORS) is activated using the flask_cors extension.
+The generated SQL query undergoes refinement to meet specific criteria and avoid particular patterns.
+Database connectivity is achieved through SQLAlchemy.
+OpenAI's API is employed for text generation.
+
 Contributors
-Gustavo.
+Contributor: Gustavo Bramao.
+
+
+
+
+
