@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KnowledgePal</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet" />
+    <link href="css/search.css" rel="stylesheet" />
+
+    <!-- Include the FontAwesome library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+   
+    <style>
+        #chartContainer {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        #dataTable {
+        border-collapse: collapse;
+        width: 30%; /* Adjust the width of the table */
+        margin: 30px left; /* Center the table horizontally */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    }
+
+        #dataTable th {
+            background-color: #f2f2f2;
+            text-align: left;
+            padding: 8px; /* Reduce the padding for a more compact table */
+            border: 1px solid #ddd;
+            font-weight: bold;
+            font-size: 12px; /* Decrease the font size */
+            text-transform: capitalize; /* Capitalize the column headers */
+        }
+
+        #dataTable td {
+            padding: 8px; /* Reduce the padding for a more compact table */
+            border: 1px solid #ddd;
+            font-size: 12px; /* Decrease the font size */
+        }
+
+        /* Make the date column narrower */
+        #dataTable td:first-child {
+            width: 10px; /* Adjust the width of the date column */
+            max-width: 10px; /* Set a maximum width for the date column */
+            white-space: nowrap; /* Prevent line breaks in the date cell */
+            overflow: hidden; /* Hide any overflow in the date cell */
+            text-overflow: ellipsis; /* Show ellipsis (...) for long dates */
+        }
+
+
+        #dataTable td:last-child {
+        width: 20px; /* Adjust the width of the value column */
+        max-width: 20px; /* Set a maximum width for the value column */
+        white-space: nowrap; /* Prevent line breaks in the value cell */
+        overflow: hidden; /* Hide any overflow in the value cell */
+        text-overflow: ellipsis; /* Show ellipsis (...) for long values */
+        }
+
+        #dataTable tbody tr:hover {
+            background-color: #f9f9f9;
+            cursor: pointer; /* Add a pointer cursor on hover */
+        }
+
+        #dataTable {
+        display: none;
+        }
+
+
+        #loadingMessage {
+            display: none;
+            text-align: center;
+            background-color: #3054d4;
+            color: #ffffff;
+            padding: 10px;
+            font-family: verdana;
+        }
+
+        #loadingSpinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #dataTable tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+
+
+
+
+
+</head>
+<body>
+    <div id="searchBar">
+        <input type="text" id="userInput" placeholder="Ask your questions" />
+        <button id="searchButton"><i class="fas fa-search"></i></button> <!-- Search button -->
+    </div>
+
+    <button id="recordButton"><i class="fas fa-microphone"></i></button> <!-- Microphone button -->
+
+    <div id="chartContainer"></div>
+
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Table body rows will be dynamically populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <span id="loadingMessage">
+        <span id="loadingSpinner"></span> Generative AI producing Answer!
+    </span>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', fetchData);
+
+        let chartData = [];
+        let chartProperty = null; // Default chart property
+
+        function setChartPropertyFromUserInput(userInput) {
+            const elements = ['margin', 'transactions', 'new_cst', 'orders', 'cvr'];
+            const matchedElement = elements.find(element => userInput.includes(element));
+
+            if (matchedElement) {
+                chartProperty = matchedElement;
+            } else {
+                chartProperty = 'revenue'; // Default chart property if no match is found
+            }
+        }
+
+        // Disable accessibility
+        Highcharts.setOptions({
+            accessibility: {
+                enabled: false
+            }
+        });
+
+        function showLoadingMessage() {
+            document.getElementById('loadingMessage').style.display = 'block';
+        }
+
+        function hideLoadingMessage() {
+            document.getElementById('loadingMessage').style.display = 'none';
+        }
+
+        function fetchData() {
+            const userInput = document.getElementById('userInput').value;
+            setChartPropertyFromUserInput(userInput);
+
+            const apiUrl = `http://localhost:5000/query?user_input=${encodeURIComponent(userInput)}`;
+
+            showLoadingMessage(); // Show the loading message
+
+            fetch(apiUrl)
+                .then(response => {
+                    hideLoadingMessage(); // Hide the loading message
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        chartData = data.map(obj => ({
+                            x: moment(obj.date).valueOf(),
+                            y: obj[chartProperty]
+                        }));
+
+                        console.log('Chart Data:', chartData);
+                        updateChart(userInput); // Pass the userInput to updateChart function
+
+                        updateTable(data); // Pass the data to updateTable function
+                        // Show the table once the data is available
+                        document.getElementById('dataTable').style.display = 'table';
+                    } else {
+                        console.error('Invalid API response:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching API data:', error);
+                });
+        }
+
+        function updateChart(userInput) {
+            const chartOptions = {
+                chart: {
+                    renderTo: 'chartContainer',
+                    type: 'line'
+                },
+                title: {
+                    text: userInput // Set the title text to userInput
+                },
+                xAxis: {
+                    type: 'datetime',
+                    title: {
+                        text: 'Date'
+                    },
+                    labels: {
+                        formatter: function () {
+                            return moment(this.value).format('YYYY-MM-DD');
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: chartProperty
+                    }
+                },
+                series: [{
+                    name: chartProperty,
+                    data: chartData,
+                    color: '#3054d4' // Set the color of the time series plot
+                }],
+                credits: {
+                    enabled: false // Remove Highcharts.com credit
+                }
+            };
+
+            console.log('Chart Options:', chartOptions);
+
+            if (document.getElementById('chartContainer')) {
+                new Highcharts.Chart(chartOptions);
+            } else {
+                console.error('chartContainer div not found in the DOM');
+            }
+        }
+
+        function updateTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Clear the existing table rows
+
+            const maxCellValue = Math.max(...data.map(obj => obj[chartProperty]));
+            const minCellValue = Math.min(...data.map(obj => obj[chartProperty]));
+
+            data.forEach(obj => {
+                const row = document.createElement('tr');
+                const dateCell = document.createElement('td');
+                const valueCell = document.createElement('td');
+
+                const formattedDate = moment(obj.date).format('YYYY-MM-DD');
+                dateCell.textContent = formattedDate;
+                valueCell.textContent = obj[chartProperty];
+
+                // Calculate the heatmap color based on the cell value
+                const cellValue = obj[chartProperty];
+                const normalizedValue = (cellValue - minCellValue) / (maxCellValue - minCellValue);
+                const color = getColorFromValue(normalizedValue);
+
+                valueCell.style.backgroundColor = color;
+
+                row.appendChild(dateCell);
+                row.appendChild(valueCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        function getColorFromValue(value) {
+            const colors = ['#cbd4f4', '#647fdf', '#98aaea', '#3054d4'];
+            const index = Math.floor(value * (colors.length - 1));
+            return colors[index];
+        }
+
+        let recordButton = document.getElementById('recordButton');
+        let recognition;
+        let isRecording = false;
+
+        recordButton.addEventListener('click', toggleRecording);
+
+        function toggleRecording() {
+            if (!isRecording) {
+                recordButton.innerHTML = '<i class="fas fa-stop"></i>'; // Change button icon
+                isRecording = true;
+                startRecognition();
+            } else {
+                recordButton.innerHTML = '<i class="fas fa-microphone"></i>'; // Change button icon
+                isRecording = false;
+                stopRecognition();
+            }
+        }
+
+        function startRecognition() {
+            recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            recognition.addEventListener('result', handleRecognitionResult);
+            recognition.addEventListener('error', handleRecognitionError);
+
+            recognition.start();
+        }
+
+        function stopRecognition() {
+            recognition.stop();
+            recognition.removeEventListener('result', handleRecognitionResult);
+            recognition.removeEventListener('error', handleRecognitionError);
+            recognition = null;
+        }
+
+        function handleRecognitionResult(event) {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            const resultDiv = document.getElementById('userInput');
+            resultDiv.value = finalTranscript;
+        }
+
+        function handleRecognitionError(event) {
+            console.error('Speech recognition error:', event.error);
+        }
+    </script>
+</body>
+</html>

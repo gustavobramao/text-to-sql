@@ -1,0 +1,91 @@
+#loadingMessage {
+  display: none;
+  text-align: center;
+  background-color: #3054d4;
+  color: #ffffff;
+  padding: 10px;
+  font-family: Tahoma;
+  font-weight: 300; /* Adjust the font weight to make it thinner */
+}
+
+#loadingSpinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+#timeSeriesChart {
+  width: 800px;
+  height: 400px;
+  margin: 20px auto;
+}
+
+#searchBar {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto;
+  position: relative;
+}
+
+#userInput {
+  flex-grow: 1;
+  padding: 10px 40px 10px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #3054d4;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #357ae8;
+}
+
+#search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: white;
+  z-index: 1; /* Increase the z-index value */
+  cursor: pointer; /* Add cursor pointer */
+}
+
+@media only screen and (max-width: 600px) {
+  #userInput {
+    width: 90%;
+    margin: 10px auto;
+  }
+
+  button {
+    width: 90%;
+    margin: 10px auto;
+  }
+}
