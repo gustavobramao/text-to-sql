@@ -17,7 +17,7 @@ Create a config.py file in the project directory with your OpenAI API key:
 open_ai_api_key = "your_openai_api_key_here"
 
 
-Running the Application
+# Running the Application
 Make sure you are in the project directory and your virtual environment is activated.
 
 Run the Flask application:
